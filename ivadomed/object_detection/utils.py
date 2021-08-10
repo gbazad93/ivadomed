@@ -10,6 +10,7 @@ from scipy import ndimage
 from ivadomed import postprocessing as imed_postpro
 from ivadomed import transforms as imed_transforms
 from ivadomed.loader import utils as imed_loader_utils
+from ivadomed.keywords import *
 
 
 def get_bounding_boxes(mask):
@@ -237,22 +238,22 @@ def load_bounding_boxes(object_detection_params, subject_path_list, slice_axis, 
     """
     # Load or generate bounding boxes and save them in json file
     bounding_box_dict = {}
-    if object_detection_params is None or object_detection_params['object_detection_path'] is None:
+    if object_detection_params is None or object_detection_params[ObjectDetectionParamsKW.OBJECT_DETECTION_PATH] is None:
         return bounding_box_dict
-    bounding_box_path = os.path.join(object_detection_params['path_output'], 'bounding_boxes.json')
+    bounding_box_path = os.path.join(object_detection_params[ObjectDetectionParamsKW.PATH_OUTPUT], 'bounding_boxes.json')
     if os.path.exists(bounding_box_path):
         with open(bounding_box_path, 'r') as fp:
             bounding_box_dict = json.load(fp)
-    elif object_detection_params['object_detection_path'] is not None and \
-            os.path.exists(object_detection_params['object_detection_path']):
+    elif object_detection_params[ObjectDetectionParamsKW.OBJECT_DETECTION_PATH] is not None and \
+            os.path.exists(object_detection_params[ObjectDetectionParamsKW.OBJECT_DETECTION_PATH]):
         bounding_box_dict = generate_bounding_box_file(subject_path_list,
-                                                       object_detection_params['object_detection_path'],
-                                                       object_detection_params['path_output'],
-                                                       object_detection_params['gpu_ids'],
+                                                       object_detection_params[ObjectDetectionParamsKW.OBJECT_DETECTION_PATH],
+                                                       object_detection_params[ObjectDetectionParamsKW.PATH_OUTPUT],
+                                                       object_detection_params[ObjectDetectionParamsKW.GPU_IDS],
                                                        slice_axis,
                                                        constrast_lst,
-                                                       safety_factor=object_detection_params['safety_factor'])
-    elif object_detection_params['object_detection_path'] is not None:
+                                                       safety_factor=object_detection_params[ObjectDetectionParamsKW.SAFETY_FACTOR])
+    elif object_detection_params[ObjectDetectionParamsKW.OBJECT_DETECTION_PATH] is not None:
         raise RuntimeError("Path to object detection model doesn't exist")
 
     return bounding_box_dict

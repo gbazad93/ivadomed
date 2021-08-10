@@ -20,6 +20,7 @@ from ivadomed import models as imed_models
 from ivadomed import utils as imed_utils
 from ivadomed import visualize as imed_visualize
 from ivadomed.loader import utils as imed_loader_utils
+from ivadomed.keywords import *
 
 cudnn.benchmark = True
 
@@ -53,7 +54,7 @@ def train(model_params, dataset_train, dataset_val, training_params, path_output
     writer = SummaryWriter(log_dir=path_output)
 
     # BALANCE SAMPLES AND PYTORCH LOADER
-    conditions = all([training_params["balance_samples"]["applied"], model_params["name"] != "HeMIS"])
+    conditions = all([training_params["balance_samples"]["applied"], model_params[ModelParamsKW.NAME] != "HeMIS"])
     sampler_train, shuffle_train = get_sampler(dataset_train, conditions, training_params['balance_samples']['type'])
 
     train_loader = DataLoader(dataset_train, batch_size=training_params["batch_size"],
@@ -96,7 +97,7 @@ def train(model_params, dataset_train, dataset_val, training_params, path_output
                                                   reset=reset)
     else:
         logger.info("Initialising model's weights from scratch.")
-        model_class = getattr(imed_models, model_params["name"])
+        model_class = getattr(imed_models, model_params[ModelParamsKW.NAME])
         model = model_class(**model_params)
     if cuda_available:
         model.cuda()
@@ -157,7 +158,7 @@ def train(model_params, dataset_train, dataset_val, training_params, path_output
         num_steps = 0
         for i, batch in enumerate(train_loader):
             # GET SAMPLES
-            if model_params["name"] == "HeMISUnet":
+            if model_params[ModelParamsKW.NAME] == ConfigKW.HEMISUNET:
                 input_samples = imed_utils.cuda(imed_utils.unstack_tensors(batch["input"]), cuda_available)
             else:
                 input_samples = imed_utils.cuda(batch["input"], cuda_available)
@@ -169,8 +170,8 @@ def train(model_params, dataset_train, dataset_val, training_params, path_output
                                                              debugging and epoch == 1, path_output)
 
             # RUN MODEL
-            if model_params["name"] == "HeMISUnet" or \
-                    ('film_layers' in model_params and any(model_params['film_layers'])):
+            if model_params[ModelParamsKW.NAME] == ConfigKW.HEMISUNET or \
+                    (ModelParamsKW.FILM_LAYERS in model_params and any(model_params[ModelParamsKW.FILM_LAYERS])):
                 metadata = get_metadata(batch["input_metadata"], model_params)
                 preds = model(input_samples, metadata)
             else:
@@ -206,10 +207,10 @@ def train(model_params, dataset_train, dataset_val, training_params, path_output
         tqdm.write(msg)
 
         # CURRICULUM LEARNING
-        if model_params["name"] == "HeMISUnet":
+        if model_params[ModelParamsKW.NAME] == ConfigKW.HEMISUNET:
             # Increase the probability of a missing modality
-            model_params["missing_probability"] **= model_params["missing_probability_growth"]
-            dataset_train.update(p=model_params["missing_probability"])
+            model_params[ModelParamsKW.MISSING_PROBABILITY] **= model_params[ModelParamsKW.MISSING_PROBABILITY_GROWTH]
+            dataset_train.update(p=model_params[ModelParamsKW.MISSING_PROBABILITY])
 
         # Validation loop -----------------------------------------------------
         model.eval()
@@ -220,15 +221,15 @@ def train(model_params, dataset_train, dataset_val, training_params, path_output
             for i, batch in enumerate(val_loader):
                 with torch.no_grad():
                     # GET SAMPLES
-                    if model_params["name"] == "HeMISUnet":
+                    if model_params[ModelParamsKW.NAME] == ConfigKW.HEMISUNET:
                         input_samples = imed_utils.cuda(imed_utils.unstack_tensors(batch["input"]), cuda_available)
                     else:
                         input_samples = imed_utils.cuda(batch["input"], cuda_available)
                     gt_samples = imed_utils.cuda(batch["gt"], cuda_available, non_blocking=True)
 
                     # RUN MODEL
-                    if model_params["name"] == "HeMISUnet" or \
-                            ('film_layers' in model_params and any(model_params['film_layers'])):
+                    if model_params[ModelParamsKW.NAME] == ConfigKW.HEMISUNET or \
+                            (ModelParamsKW.FILM_LAYERS in model_params and any(model_params[ModelParamsKW.FILM_LAYERS])):
                         metadata = get_metadata(batch["input_metadata"], model_params)
                         preds = model(input_samples, metadata)
                     else:
@@ -322,13 +323,13 @@ def train(model_params, dataset_train, dataset_val, training_params, path_output
         # Save best model as ONNX in the model directory
         try:
             # Convert best model to ONNX and save it in model directory
-            best_model_path = os.path.join(path_output, model_params["folder_name"],
-                                           model_params["folder_name"] + ".onnx")
+            best_model_path = os.path.join(path_output, model_params[ModelParamsKW.FOLDER_NAME],
+                                           model_params[ModelParamsKW.FOLDER_NAME] + ".onnx")
             imed_utils.save_onnx_model(model, input_samples, best_model_path)
         except:
             # Save best model in model directory
-            best_model_path = os.path.join(path_output, model_params["folder_name"],
-                                           model_params["folder_name"] + ".pt")
+            best_model_path = os.path.join(path_output, model_params[ModelParamsKW.FOLDER_NAME],
+                                           model_params[ModelParamsKW.FOLDER_NAME] + ".pt")
             torch.save(model, best_model_path)
             logger.warning("Failed to save the model as '.onnx', saved it as '.pt': {}".format(best_model_path))
 
@@ -437,10 +438,10 @@ def get_metadata(metadata, model_params):
         If FiLMedUnet, Returns a list of metadata, that have been transformed by the One Hot Encoder.
         If HeMISUnet, Returns a numpy array where each row represents a sample and each column represents a contrast.
     """
-    if model_params["name"] == "HeMISUnet":
+    if model_params[ModelParamsKW.NAME] == ConfigKW.HEMISUNET:
         return np.array([m[0]["missing_mod"] for m in metadata])
     else:
-        return [model_params["film_onehotencoder"].transform([metadata[k][0]['film_input']]).tolist()[0]
+        return [model_params[ModelParamsKW.FILM_ONEHOTENCODER].transform([metadata[k][0]['film_input']]).tolist()[0]
                 for k in range(len(metadata))]
 
 

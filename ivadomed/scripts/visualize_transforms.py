@@ -12,6 +12,7 @@ from ivadomed.loader import utils as imed_loader_utils
 from ivadomed import transforms as imed_transforms
 from ivadomed import utils as imed_utils
 from ivadomed import maths as imed_maths
+from ivadomed.keywords import *
 
 
 def get_parser():
@@ -101,7 +102,7 @@ def run_visualization(input, config, number, output, roi):
         os.makedirs(output)
 
     # Slice extracted according to below axis
-    axis = imed_utils.AXIS_DCT[context["loader_parameters"]["slice_axis"]]
+    axis = imed_utils.AXIS_DCT[context[ConfigKW.LOADER_PARAMETERS][LoaderParamsKW.SLICE_AXIS]]
     # Get data
     input_img, input_data = get_data(input, axis)
     # Image or Mask
@@ -112,9 +113,9 @@ def run_visualization(input, config, number, output, roi):
     indexes = random.sample(range(0, input_data.shape[2]), number)
 
     # Get training transforms
-    training_transforms, _, _ = imed_transforms.get_subdatasets_transforms(context["transformation"])
+    training_transforms, _, _ = imed_transforms.get_subdatasets_transforms(context[ConfigKW.TRANSFORMATION])
 
-    if "ROICrop" in training_transforms:
+    if TransformationKW.ROICROP in training_transforms:
         if roi and os.path.isfile(roi):
             roi_img, roi_data = get_data(roi, axis)
         else:
@@ -142,7 +143,8 @@ def run_visualization(input, config, number, output, roi):
             metadata = imed_loader_utils.SampleMetadata({"zooms": zooms, "data_type": "gt" if is_mask else "im"})
 
             # Apply transformations to ROI
-            if "CenterCrop" in training_transforms or ("ROICrop" in training_transforms and os.path.isfile(roi)):
+            if TransformationKW.CENTERCROP in training_transforms or \
+                    (TransformationKW.ROICROP in training_transforms and os.path.isfile(roi)):
                 metadata.__setitem__('crop_params', {})
 
             # Apply transformations to image
