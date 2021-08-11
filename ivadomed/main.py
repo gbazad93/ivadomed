@@ -491,7 +491,7 @@ def run_command(context, n_gif=0, thr_increment=None, resume_training=False):
         # RUN EVALUATION
         df_results = imed_evaluation.evaluate(bids_df, path_output=path_output,
                                               target_suffix=loader_params[LoaderParamsKW.TARGET_SUFFIX],
-                                              eval_params=context[ConfigKW.ELEVATION_PARAMETERS])
+                                              eval_params=context[ConfigKW.EVALUATION_PARAMETERS])
         return df_results, pred_metrics
 
 

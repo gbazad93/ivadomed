@@ -20,7 +20,7 @@ class ConfigKW:
     SPLIT_DATASET = "split_dataset"
     UNCERTAINTY = "uncertainty"
     UNDO_TRANSFORMS = "undo_transforms"
-    ELEVATION_PARAMETERS = "elevation_parameters"
+    EVALUATION_PARAMETERS = "evaluation_parameters"
     HEMISUNET = "HeMISUnet"
     SPLIT_PATH = "split_path"
     TRAINING_SHA256 = "training_sha256"
