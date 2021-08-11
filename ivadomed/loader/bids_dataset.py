@@ -77,8 +77,8 @@ class BidsDataset(MRI2DSegmentationDataset):
         multichannel_subjects = {}
         idx_dict = {}
         if multichannel:
-            num_contrast = len(contrast_params[ContrastParamsKW.CONTRAST_LIST])
-            for idx, contrast in enumerate(contrast_params[ContrastParamsKW.CONTRAST_LIST]):
+            num_contrast = len(contrast_params[ContrastParamsKW.CONTRAST_LST])
+            for idx, contrast in enumerate(contrast_params[ContrastParamsKW.CONTRAST_LST]):
                 idx_dict[contrast] = idx
             multichannel_subjects = {subject: {"absolute_paths": [None] * num_contrast,
                                                "deriv_path": None,
@@ -93,7 +93,7 @@ class BidsDataset(MRI2DSegmentationDataset):
         bounding_box_dict = imed_obj_detect.load_bounding_boxes(object_detection_params,
                                                                 get_all_subj_path,
                                                                 slice_axis,
-                                                                contrast_params[ContrastParamsKW.CONTRAST_LIST])
+                                                                contrast_params[ContrastParamsKW.CONTRAST_LST])
 
         # Get all derivatives filenames from bids_df
         all_deriv = bids_df.get_deriv_fnames()

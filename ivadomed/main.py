@@ -134,10 +134,10 @@ def save_config_file(context, path_output):
 def set_loader_params(context, is_train):
     loader_params = copy.deepcopy(context[ConfigKW.LOADER_PARAMETERS])
     if is_train:
-        loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.CONTRAST_LIST] = \
+        loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.CONTRAST_LST] = \
             loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.TRAINING_VALIDATION]
     else:
-        loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.CONTRAST_LIST] =\
+        loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.CONTRAST_LST] =\
             loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.TESTING]
     if ConfigKW.FILMEDUNET in context and context[ConfigKW.FILMEDUNET][ModelParamsKW.APPLIED]:
         loader_params.update({LoaderParamsKW.METADATA_TYPE: context[ConfigKW.FILMEDUNET][ModelParamsKW.METADATA]})
@@ -173,7 +173,7 @@ def set_model_params(context, loader_params):
     # Get in_channel from contrast_lst
     if loader_params[LoaderParamsKW.MULTICHANNEL]:
         model_params[ModelParamsKW.IN_CHANNEL] = \
-            len(loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.CONTRAST_LIST])
+            len(loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.CONTRAST_LST])
     else:
         model_params[ModelParamsKW.IN_CHANNEL] = 1
     # Get out_channel from target_suffix

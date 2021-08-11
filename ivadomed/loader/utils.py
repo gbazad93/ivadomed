@@ -615,8 +615,8 @@ class BidsDataframe:
             else [".nii", ".nii.gz"]
 
         # contrast_lst from loader parameters
-        self.contrast_lst = [] if ContrastParamsKW.CONTRAST_LIST not in loader_params[LoaderParamsKW.CONTRAST_PARAMS] \
-                            else loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.CONTRAST_LIST]
+        self.contrast_lst = [] if ContrastParamsKW.CONTRAST_LST not in loader_params[LoaderParamsKW.CONTRAST_PARAMS] \
+                            else loader_params[LoaderParamsKW.CONTRAST_PARAMS][ContrastParamsKW.CONTRAST_LST]
 
         # derivatives
         self.derivatives = derivatives

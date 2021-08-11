@@ -501,11 +501,11 @@ class HDF5Dataset:
     def __init__(self, bids_df, subject_file_lst, model_params, target_suffix, contrast_params,
                  slice_axis=2, transform=None, metadata_choice=False, dim=2, complet=True,
                  slice_filter_fn=None, roi_params=None, object_detection_params=None, soft_gt=False):
-        self.cst_lst = copy.deepcopy(contrast_params[ContrastParamsKW.CONTRAST_LIST])
-        self.gt_lst = copy.deepcopy(model_params[ModelParamsKW.TARGET_LIST]
-                                    if ModelParamsKW.TARGET_LIST in model_params else None)
-        self.roi_lst = copy.deepcopy(model_params[ModelParamsKW.ROI_LIST]
-                                     if ModelParamsKW.ROI_LIST in model_params else None)
+        self.cst_lst = copy.deepcopy(contrast_params[ContrastParamsKW.CONTRAST_LST])
+        self.gt_lst = copy.deepcopy(model_params[ModelParamsKW.TARGET_LST]
+                                    if ModelParamsKW.TARGET_LST in model_params else None)
+        self.roi_lst = copy.deepcopy(model_params[ModelParamsKW.ROI_LST]
+                                     if ModelParamsKW.ROI_LST in model_params else None)
         self.dim = dim
         self.roi_params = roi_params if roi_params is not None else \
             {ROIParamsKW.SUFFIX: None, ROIParamsKW.SLICE_FILTER_ROI: None}
